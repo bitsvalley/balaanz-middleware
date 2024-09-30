@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:insert="header::navbar" class="sticky-header">  </div>
+<br/>
+<br/>
+
+
+<!--Choosen area start-->
+<section class="choosen-area-start space">
+    <!--Project title area start-->
+    <div class="project-title-area text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="project-title-content">
+                        <h3 th:text="${savingAccountTransaction.savingAccount.accountNumber}"></h3>
+                        <span><i class="fas fa-crosshairs"></i></span><br/>
+                        <font color="#BF360C;" size="4"><h4>Make a payment/ withdrawal transaction with this Saving Account</h4></font>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table class="center" width="100%" border="0">
+        <tr>
+            <th>
+                Account Type
+            </th>
+            <th>
+                Account number
+            </th>
+            <th>
+                Account holder
+            </th>
+        </tr>
+        <tr>
+            <td>
+                <div th:text="${savingAccountTransaction.savingAccount.accountType.name}"/>
+            </td>
+            <td>
+                <font color="#BF360C;"><b>
+                    <div th:text="${savingAccountTransaction.savingAccount.accountNumber}"/>
+                </b></font>
+            </td>
+            <td>
+                <a href="#" th:href="@{/showCustomer/{id}(id=${session.customerInUse.id})}">
+                    <font color="gray" size="4">
+                        <span style th:text="${session.customerInUse.gender +' '+session.customerInUse.firstName +' '+session.customerInUse.lastName }"/>
+                        <br/>
+                        <span style th:text="${session.customerInUse.customerNumber}"/><br/>
+                    </font>
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <form action="#" th:action="@{/registerSavingAccountTransactionForm}" method="post"
+          th:object="${savingAccountTransaction}">
+
+        <table border="0" width="100%" class="center">
+            <tr>
+                <td>
+                        <select name="deposit_withdrawal">
+                            <option value="DEPOSIT">DEPOSIT</option>
+                            <option value="WITHDRAWAL">WITHDRAWAL</option>
+                        </select>
+                </td>
+            </tr>
+            <tr>
+                <td><b>Amount:</b><input size="6" type="number" th:field="*{savingAmount}"/></td>
+            </tr>
+            <tr>
+                <td><label for="modeOfPayment"><b>Mode:</b></label><select name="modeOfPayment" id="modeOfPayment">
+                    <option value="CASH">CASH</option>
+                    <option disabled value="MOMO">MOMO</option>
+                    <option disabled value="ORANGE MONEY">ORANGE MONEY</option>
+                    <option value="PAYPAL">PAYPAL</option>
+                    <option disabled value="TRANSFER">TRANSFER</option>
+                    <option value="RECEIPT">RECEIPT</option>
+                    <option disabled value="OTHER">OTHER</option>
+                </select></td>
+                </tr>
+                <tr>
+                <td colspan="2"><label><b> Notes:</b></label>
+                    <textarea id="notes" rows="3" cols="30"
+                        th:field="*{notes}">
+                    </textarea>
+                </td>
+                </tr><tr>
+                <td><input type="hidden" th:value="${savingAccountTransaction.savingAccount.id}"
+                           th:attr="name='savingAccountId'"/>
+                    <button type="submit" class="btn btn-success">Save Payment</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <br/><br/>
+
+    <table class="center" width="100%">
+        <tr>
+            <td colspan="4"><font color="#BF360C;"><h4>Saving Account Payments Processed</h4></font></td>
+        </tr>
+    </table>
+    <table class="center" width="100%">
+        <tr>
+            <td>
+                Amount
+            </td>
+            <td>
+                Created Date
+
+            </td>
+            <td>
+                Created By
+            </td>
+            <td>
+                Notes
+            </td>
+        </tr>
+        <div th:if="${session.savingBilanzList != null}">
+            <tr th:each="aSavingAccountTransaction : ${session.savingBilanzList.savingBilanzList}">
+                <td>
+                    <p th:text="${aSavingAccountTransaction.savingAmount}"/>
+                </td>
+                <td>
+                    <p th:text="${aSavingAccountTransaction.createdDate}"/>
+                </td>
+                <td>
+                    <p th:text="${aSavingAccountTransaction.createdBy}"/>
+                </td>
+                <td>
+                    <p th:text="${aSavingAccountTransaction.notes}"/>
+                </td>
+            </tr>
+        </div>
+    </table>
+
+
+    <!--Choosen main area end-->
+</section>
+<!--Choosen area end-->
+
+
+<div th:insert="footer::navbar">  </div>
+</html>

@@ -19,6 +19,4 @@ public interface DailySavingsAccountService {
   List<DailySavingAccountTransactions> agentlatestTransactions(long accountId);
 
   List<DailySavingAccountTransactions> agentTransactions(long accountId, String transactionType);
-
-  void remitTransactions(List<Long> transactionIds);
 }

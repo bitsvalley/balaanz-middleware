@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:insert="header::navbar" class="sticky-header"></div>
+<div th:insert="summary::navbar"></div>
+<div class="page-container">
+    <div class="container">
+        <form class="form-bootstrap" action="#" th:action="@{/registerDailySavingAccountForm}" method="post"
+              th:object="${dailySavingAccount}">
+            <div class="form-sections">
+                <h3 th:style="${'color:' + session.runtimeSettings.themeColor2}">CREATE A <span
+                        th:text="${session.runtimeSettings.dailySavingAccount}"/></h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="savingType">Account Type:</label>
+                            <select class="form-control" name="savingType" id="savingType" th:field="*{productCode}">
+<!--                                    <option th:each="accountType: ${accountTypes}"-->
+<!--                                            th:text="${accountType.displayName}"-->
+<!--                                            th:value="${accountType.number}">-->
+<!--                                    </option>-->
+                                <option value="13">DAILY SAVINGS - 13</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="accountMinBalance">Amount on Hold:</label>
+                            <input id="accountMinBalance" class="form-control" placeholder="0" type="number"
+                                   th:field="*{accountMinBalance}"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div th:if="${#strings.isEmpty(session.runtimeSettings.apartmentAccount)}">
+                                <label for="interestRate">Interest Rate:</label>
+                                <input id="interestRate" class="form-control" type="text" th:field="*{interestRate}"
+                                       max="100" maxlength="5"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div th:if="${#strings.isEmpty(session.runtimeSettings.apartmentAccount)}">
+                                <label for="minimumPayment">Minimum Deposit:</label>
+                                <input id="minimumPayment" class="form-control" placeholder="0" type="number"
+                                       th:field="*{minimumPayment}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="notes">Notes:</label>
+                            <textarea class="form-control" placeholder="Notes .." id="notes" rows="3"
+                                      th:field="*{notes}">
+                            </textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <button class="btn btn-orange" th:style="${'background-color:' + session.runtimeSettings.themeColor + ';' + 'border-color:' + session.runtimeSettings.themeColor}" type="submit">Create <span th:text="${session.runtimeSettings.dailySavingAccount}"/></button>
+                        <label title="Minimum Deposit is minimum amount that can be deposited in this account. Minimum Balance is the amount that the account should not go below">
+                            <img alt="not go below." width="20px" th:src="@{/assets/images/toolTip.png}"/></label>
+
+                        <select hidden class="selectNormal" name="intervalOfSaving" id="intervalOfSaving">
+                            <option value="01 DAY">01 DAY</option>
+                            <option value="15 DAY">15 DAY</option>
+                            <option value="OTHER">OTHER</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 
+    <div class="container">
+    <h4><font color="green">CREATE A <span th:text="${session.runtimeSettings.savingAccount}"/></font></h4>
+    <form action="#" th:action="@{/registerSavingAccountForm}" method="post" th:object="${savingAccount}">
+        <table class="center" width="90%">
+            <tr><td>
+            </td></tr>
+            <tr><td width="0%"></td><td>
+                <br/>
+                 Saving Type:
+                <select class="selectNormal" name="savingType" id="savingType" th:field="*{productCode}">
+                    <option value="11">GENERAL SAVINGS - 11</option>
+                    <option value="12">RETIREMENT SAVINGS - 12</option>
+                    <option value="13">DAILY SAVINGS - 13</option>
+                    <option value="14">MEDICAL SAVINGS - 14</option>
+                    <option value="15">SOCIAL SAVINGS - 15</option>
+                    <option value="16">BUSINESS SAVINGS - 16</option>
+                    <option value="17">CHILDREN SAVINGS - 17</option>
+                    <option value="18">REAL ESTATE SAVINGS - 18</option>
+                    <option value="19">EDUCATION SAVINGS - 19</option>
+                </select>
+
+
+                Interest Rate:
+                <input class="selectSmall" type="text" th:field="*{interestRate}" max="100" maxlength="5"/>
+
+                <br/><br/>
+            Minimum balance:
+                    <input class="selectAmount" placeholder="0" type="number" th:field="*{accountMinBalance}"/>
+
+
+                Minimum Deposit:
+                <input class="selectAmount" placeholder="0" type="number" th:field="*{minimumPayment}"/>
+                    <br/> <br/>
+
+                <textarea class="selectNormal" placeholder="Notes .." id="notes" rows="3" cols="70" th:field="*{notes}">
+                </textarea>
+                <br/>
+                <button type="submit" class="btn btn-success">Create Account</button>
+                <label title="Minimum Deposit is minimum amount that can be deposited in this account. Minimum Balance is the amount that the account should not go below"> <img alt="not go below." width="20px" th:src="@{/assets/images/toolTip.png}"/></label>
+                <br/><br/>
+                <select hidden class="selectNormal" name="intervalOfSaving" id="intervalOfSaving">
+                    <option value="01 DAY">01 DAY</option>
+                    <option value="15 DAY">15 DAY</option>
+                    <option value="OTHER">OTHER</option>
+                </select>
+
+                </td>
+            </tr>
+        </table>
+    </form>
+    </div> -->
+
+<div th:insert="footer::navbar"></div>
+</html>

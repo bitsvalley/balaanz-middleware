@@ -40,13 +40,7 @@ public class DailySavingAccountController extends SuperController {
     AccountTypeRepository accountTypeRepository;
 
     @Autowired
-    CallCenterService callCenterService;
-
-    @Autowired
     DailySavingAccountService dailySavingAccountService;
-
-    @Autowired
-    LoanAccountService loanAccountService;
 
     @Autowired
     GeneralLedgerService generalLedgerService;
@@ -55,15 +49,10 @@ public class DailySavingAccountController extends SuperController {
     UserRepository userRepository;
 
     @Autowired
-    PdfService pdfService;
-
-    @Autowired
     BranchService branchService;
 
     @Autowired
     InitSystemService initSystemService;
-    @Autowired
-    NotificationService notificationService;
 
     @GetMapping(value = "/registerDailySavingAccount")
     public String registerSaving(ModelMap model, HttpServletRequest request) {
@@ -77,20 +66,6 @@ public class DailySavingAccountController extends SuperController {
         model.put("accountTypes", byOrgIdAndCategory);
         return "dailySavingAccount";
     }
-
-
-    @PostMapping(value = "/registerDailySavingAccountForm")
-    public String registerSavingAccount(@ModelAttribute("saving") DailySavingAccount savingAccount, ModelMap model, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute(BVMicroUtils.CUSTOMER_IN_USE);
-        user = userRepository.findById(user.getId()).get();
-        Branch branchInfo = branchService.getBranchInfo(getLoggedInUserName());//TODO Create branch repo
-        savingAccount.setBranchCode(branchInfo.getCode());
-        savingAccount.setCountry(branchInfo.getCountry());
-        dailySavingAccountService.createSavingAccount(savingAccount, user);
-        return findUserByUserName(user, model, request);
-    }
-
-
 
     @GetMapping(value = "/registerDailySavingAccountTransaction/{id}")
     public String registerSavingAccountTransaction(@PathVariable("id") long id, ModelMap model, HttpServletRequest request) {
@@ -110,43 +85,9 @@ public class DailySavingAccountController extends SuperController {
 
         dailySavingAccountTransaction.setDailySavingAccount(aSavingAccount);
         model.put("dailySavingAccountTransaction", dailySavingAccountTransaction);
-        model.put("glSearchDTO", new GLSearchDTO());
 
         return "dailySavingBilanzNoInterest";
     }
-
-    @GetMapping(value = "/dailyStatementPDF/{id}")
-    public void generateStatementPDF(@PathVariable("id") long id, ModelMap model, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        User user = (User) request.getSession().getAttribute(BVMicroUtils.CUSTOMER_IN_USE);
-        RuntimeSetting runtimeSetting = (RuntimeSetting) request.getSession().getAttribute("runtimeSettings");
-        response.setHeader("Content-disposition","attachment;filename="+ id+"_statement.pdf");
-//            OutputStream responseOutputStream = response.getOutputStream();
-            Optional<DailySavingAccount> dailySavingAccount = dailySavingAccountService.findById(Long.valueOf(id));
-            SavingBilanzList savingBilanzByUserList = dailySavingAccountService.
-                    calculateAccountBilanz(dailySavingAccount.get().getDailySavingAccountTransaction(),false, runtimeSetting.getCountryCode());
-
-            Collections.reverse(savingBilanzByUserList.getSavingBilanzList());
-
-            String htmlInput = pdfService.generatePDFDailySavingBilanzList(savingBilanzByUserList, dailySavingAccount.get(),runtimeSetting.getLogo(), initSystemService.findByOrgId(user.getOrgId()) );
-            generateByteOutputStream(response, htmlInput);
-    }
-
-
-    private boolean getUserInUse(ModelMap model, HttpServletRequest request) {
-        User user = (User) request.getSession().getAttribute(BVMicroUtils.CUSTOMER_IN_USE);
-        if (user == null) {
-            model.addAttribute("user", new User());
-            return true;
-        }
-        try {
-            user.getSavingAccount().size();
-        } catch (RuntimeException exp) {
-            model.addAttribute("user", new User());
-            return true;
-        }
-        return false;
-    }
-
 
     @PostMapping(value = "/registerDailySavingAccountTransactionForm")
     public String registerSavingAccountTransactionForm(ModelMap model, @ModelAttribute("dailySavingAccountTransaction") DailySavingAccountTransaction dailySavingAccountTransaction, HttpServletRequest request) {
@@ -185,10 +126,6 @@ public class DailySavingAccountController extends SuperController {
 
         if((dailySavingAccountTransaction.getSavingAmount() + dailySavingAccountTransaction.getDailySavingAccount().getAccountBalance() ) < dailySavingAccountTransaction.getDailySavingAccount().getAccountMinBalance()){
             dailySavingAccount.setDefaultedPayment(true);// Minimum balance check
-
-//            model.put("billSelectionError", "Please make minimum payment of "+ BVMicroUtils.formatCurrency(dailySavingAccountTransaction.getDailySavingAccount().getMinimumPayment(),runtimeSetting.getCountryCode()));
-//            dailySavingAccountTransaction.setNotes(dailySavingAccountTransaction.getNotes());
-//            return displaySavingBilanzNoInterest(Long.parseLong(savingAccountId), model, dailySavingAccountTransaction, runtimeSetting);
         }
         if ("CASH".equals(dailySavingAccountTransaction.getModeOfPayment()) && "true".equals(runtimeSetting.getBillSelectionEnabled()) ) {
             if (!checkBillSelectionMatchesEnteredAmount(dailySavingAccountTransaction)) {
@@ -210,11 +147,11 @@ public class DailySavingAccountController extends SuperController {
 
         generalLedgerService.updateGLAfterCashDailySavingAccountTransaction(dailySavingAccountTransaction);
         String username = getLoggedInUserName();
-        callCenterService.saveCallCenterLog(dailySavingAccountTransaction.getReference(),
-                username, dailySavingAccount.getAccountNumber(),
-            "Daily Saving account transaction made " + formatCurrency(
-                dailySavingAccountTransaction.getSavingAmount(), runtimeSetting.getCountryCode())
-                + " " + dailySavingAccountTransaction.getNotes());
+//        callCenterService.saveCallCenterLog(dailySavingAccountTransaction.getReference(),
+//                username, dailySavingAccount.getAccountNumber(),
+//            "Daily Saving account transaction made " + formatCurrency(
+//                dailySavingAccountTransaction.getSavingAmount(), runtimeSetting.getCountryCode())
+//                + " " + dailySavingAccountTransaction.getNotes());
         // send sms
         if (StringUtils.isNotBlank(user.getTelephone1()) && user.getTelephone1().length() == 9) {
             SMSContent smsContent = SMSContent.builder()
@@ -226,7 +163,7 @@ public class DailySavingAccountController extends SuperController {
                 .amount(formatCurrency(dailySavingAccountTransaction.getSavingAmount()))
                 .balance(formatCurrency(dailySavingAccount.getAccountBalance()))
                 .build();
-            notificationService.sendSms(smsContent);
+//            notificationService.sendSms(smsContent);
         } else {
             log.info("SKIPPED SMS NOTIFICATION FOR USER : {}, PHONE1 IS INVALID",
                 user.getUserName());

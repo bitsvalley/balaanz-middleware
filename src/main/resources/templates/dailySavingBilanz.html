@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<div th:insert="header::navbar" class="sticky-header" ></div>
+<br/>
+<br/>
+<br/><br/><br/><br/><br/><br/>
+<table width="90%" class="center">
+    <tr>
+        <td><font size="1.5">Account Owner</font><br/>
+            <font color="gray" size="4">
+                <span style th:text="${session.customerInUse.gender +' '+session.customerInUse.firstName +' '+session.customerInUse.lastName }"/>
+            </font>
+            <button type="submit"><a href="#" th:href="@{/file/{userName}(userName=${session.customerInUse.userName})}">Upload
+                I.D</a></button>
+        </td>
+        <td><font size="2"> Saving</font> <br/>
+            <font size="4px" color="green">
+                <div th:text="${session.savingBilanzList.totalSaving}"/>
+            </font>
+        </td>
+        <td><font size="2"> Current</font><br/> <font size="4"> 0</font></td>
+        <td><font size="2"> Loan</font><br/> <font size="4"> 0</font></td>
+        <td><font size="2">Retirement saving </font><br/> <font size="4" color="#A57C00">0 </font> </b></td>
+    </tr>
+</table>
+
+<table width="90%" class="center">
+    <tr>
+        <th><font color="green" size="4px">SAVING INTEREST</font><br/>DOP</th>
+        <th>MOP</th>
+        <th>Agent</th>
+        <th>Interest</th>
+        <th>Notes</th>
+        <th>Days</th>
+        <th>Total Interest
+            <div th:if="${#authorization.expression('hasAnyAuthority(''ROLE_MANAGER'')')}">
+                <font color="green" size="4px">
+                    <div th:text="${savingBilanzList.totalSavingInterest}"/>
+                </font>
+            </div>
+        </th>
+        <th>Amount</th>
+        <th><font color="green" size="6px">
+            <div th:text="${savingBilanzList.totalSaving}"/>
+        </font></th>
+    </tr>
+
+    <tr th:each="bilanz : ${savingBilanzList.savingBilanzList}">
+        <td th:text="${bilanz.createdDate}"></td>
+        <td th:text="${bilanz.modeOfPayment}"></td>
+        <td th:text="${bilanz.agent}"></td>
+<!--        <td th:text="${bilanz.accountNumber}"></td>-->
+        <td th:text="${bilanz.interestRate}">
+        </td>
+        <td th:text="${bilanz.notes}"></td>
+        <td th:text="${bilanz.noOfDays}"></td>
+        <td th:text="${bilanz.interestAccrued}"></td>
+        <td th:text="${bilanz.savingAmount}"></td>
+        <td th:text="${bilanz.currentBalance}"></td>
+    </tr>
+
+</table>
+
+<br/> <br/>
+
+<div th:insert="footer::navbar"></div>
+</html>

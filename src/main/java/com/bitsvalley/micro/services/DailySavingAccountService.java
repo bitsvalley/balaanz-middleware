@@ -28,9 +28,6 @@ public class DailySavingAccountService extends SuperService {
     private AccountTypeRepository accountTypeRepository;
 
     @Autowired
-    private CurrentAccountRepository currentAccountRepository;
-
-    @Autowired
     private DailySavingAccountTransactionRepository dailySavingAccountTransactionRepository;
 
     @Autowired
@@ -43,28 +40,13 @@ public class DailySavingAccountService extends SuperService {
     private UserRepository userRepository;
 
     @Autowired
-    private CallCenterRepository callCenterRepository;
-
-    @Autowired
     private GeneralLedgerService generalLedgerService;
 
     @Autowired
     private InterestService interestService;
 
     @Autowired
-    private CallCenterService callCenterService;
-
-    @Autowired
-    private LoanAccountService loanAccountService;
-
-    @Autowired
     private BranchService branchService;
-
-    @Autowired
-    private CurrentAccountService currentAccountService;
-
-    @Autowired
-    private CurrentAccountTransactionRepository currentAccountTransactionRepository;
 
     private double minimumSaving;
 
@@ -96,7 +78,6 @@ public class DailySavingAccountService extends SuperService {
 
         savingAccount.setUser(user);
         dailySavingAccountRepository.save(savingAccount);
-        callCenterService.callCenterDailySavingAccount(savingAccount);
 
         user = userRepository.findById(user.getId()).get();
         user.getDailySavingAccount().add(savingAccount);
@@ -140,16 +121,6 @@ public class DailySavingAccountService extends SuperService {
             balance = transaction.getSavingAmount() + balance;
         }
         return savingAmount + balance;
-    }
-
-    @Transactional
-    public void createCurrentAccountTransaction(CurrentAccountTransaction currentAccountTransaction) {
-        //Get id of savingAccount transaction
-        currentAccountTransaction.setReference(BVMicroUtils.getSaltString()); //Collision
-        currentAccountTransaction.setCreatedBy(getLoggedInUserName());
-        currentAccountTransaction.setCreatedDate(LocalDateTime.now());
-        currentAccountTransactionRepository.save(currentAccountTransaction);
-        // generalLedgerService.updateSavingAccountTransaction(savingAccountTransaction);
     }
 
     @Transactional
@@ -281,7 +252,6 @@ public class DailySavingAccountService extends SuperService {
     public boolean checkMinBalanceLogin(DailySavingAccount savingAccount) {
 
         if (savingAccount.getAccountMinBalance() > savingAccount.getAccountBalance()) {
-            callCenterService.saveCallCenterLog("", savingAccount.getUser().getUserName(), savingAccount.getAccountNumber(), BVMicroUtils.MINIMUM_BALANCE_NOT_MET_FOR_THIS_ACCOUNT+savingAccount.getAccountNumber());
             return true;
         }
 
@@ -340,11 +310,11 @@ public class DailySavingAccountService extends SuperService {
                 YearMonth.from(LocalDate.of(currentDateCal.getYear(), currentDateCal.getMonth(), currentDateCal.getDayOfMonth())));
 
         if (monthsBetween >= savingAccountTransactionList.size()) {
-            CallCenter callCenter = new CallCenter();
-            callCenter.setNotes(BVMicroUtils.REGULAR_MONTHLY_PAYMENT_MISSING);
-            callCenter.setDate(new Date(System.currentTimeMillis()));
-            callCenter.setReference(savingAccount.getUser().getFirstName() + " " + savingAccount.getUser().getLastName());
-            callCenter.setAccountNumber(savingAccount.getAccountNumber());
+//            CallCenter callCenter = new CallCenter();
+//            callCenter.setNotes(BVMicroUtils.REGULAR_MONTHLY_PAYMENT_MISSING);
+//            callCenter.setDate(new Date(System.currentTimeMillis()));
+//            callCenter.setReference(savingAccount.getUser().getFirstName() + " " + savingAccount.getUser().getLastName());
+//            callCenter.setAccountNumber(savingAccount.getAccountNumber());
             return true;
         }
 

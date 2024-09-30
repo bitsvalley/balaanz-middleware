@@ -1,0 +1,19 @@
+use balanz101db;
+#BLNZ-17
+ALTER TABLE loan_account_transaction ADD COLUMN representative VARCHAR (255);
+ALTER TABLE current_account_transaction ADD COLUMN representative VARCHAR (255);
+ALTER TABLE saving_account_transaction ADD COLUMN representative VARCHAR (255);
+
+ALTER TABLE loan_account_transaction ADD COLUMN accountBalance DOUBLE;
+ALTER TABLE current_account_transaction ADD COLUMN accountBalance DOUBLE;
+ALTER TABLE saving_account_transaction ADD COLUMN accountBalance DOUBLE;
+ALTER TABLE share_account_transaction ADD COLUMN accountBalance DOUBLE;
+
+ALTER TABLE generallegder ADD COLUMN representative VARCHAR (255);
+
+
+ALTER TABLE balanz101db.account_type DROP name;
+ALTER TABLE balanz101db.account_type DROP number;
+
+ALTER TABLE balanz101db.ledgeraccount DROP name;
+ALTER TABLE balanz101db.ledgeraccount DROP code;
